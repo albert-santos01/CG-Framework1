@@ -5,6 +5,7 @@ uniform mat4 viewprojection;
 uniform vec3 light_position;
 uniform vec3 Id;
 uniform vec3 Is;
+uniform vec3 camera_position;
 
 uniform vec3 Ka;
 uniform vec3 Kd;

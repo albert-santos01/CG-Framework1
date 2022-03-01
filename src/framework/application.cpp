@@ -100,6 +100,7 @@ void Application::render(void)
 	model_matrix.rotate(angle, Vector3(0, 1, 0));
 	shader->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
 	shader->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+	shader->setVector3("camera_position", camera->eye);
 	
 
 	//CODE HERE: pass all the info needed by the shader to do the computations
