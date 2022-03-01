@@ -9,6 +9,9 @@ void main()
 {
 	//here we set up the normal as a color to see them as a debug
 	vec3 color = v_wNormal;
+	//temp = color.x;
+	color.x = color.z;
+	//color.z = temp;
 
 	//here write the computations for PHONG.
 	//for GOURAUD you dont need to do anything here, just pass the color from the vertex shader

@@ -14,7 +14,7 @@
 Camera* camera = NULL;
 Mesh* mesh = NULL;
 Shader* shader = NULL;
-
+Shader* shader_test = NULL;
 //might be useful...
 Material* material = NULL;
 Light* light = NULL;
@@ -57,6 +57,12 @@ void Application::init(void)
 
 	//we load one or several shaders...
 	shader = Shader::Get( "../res/shaders/simple.vs", "../res/shaders/simple.fs" );
+
+	//where to start:
+	/*shader_test = Shader::Get("../res/shaders/simple.vs", "../res/shaders/simple.fs");
+	shader_test->setFilenames("gouraud.vs", "gouraud.fs");*/
+
+	//where to start
 
 	//load your Gouraud and Phong shaders here and stored them in some global variables
 	//...
