@@ -14,6 +14,7 @@ public:
 	float shininess; //glosiness coefficient (plasticity)
 
 	Material();
+	void uploadToShader(Shader* shader);
 	
 };
 

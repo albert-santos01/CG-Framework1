@@ -3,8 +3,13 @@ uniform mat4 model;
 uniform mat4 viewprojection;
 
 uniform vec3 light_position;
-uniform vec3 diffuse;
-uniform vec3 specular;
+uniform vec3 Id;
+uniform vec3 Is;
+
+uniform vec3 Ka;
+uniform vec3 Kd;
+uniform vec3 Ks;
+uniform float aplha;
 
 //vars to pass to the pixel shader
 varying vec3 v_wPos;

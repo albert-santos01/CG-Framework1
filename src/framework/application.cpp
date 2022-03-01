@@ -62,13 +62,15 @@ void Application::init(void)
 	shader_test = Shader::Get("../res/shaders/gouraud.vs", "../res/shaders/gouraud.fs");
 
 	//where to start
-	light = Light();
+	
 	//load your Gouraud and Phong shaders here and stored them in some global variables
 	//...
 
 	//CODE HERE:
 	//create a light (or several) and and some materials
 	//...
+	light = Light();
+	material = Material();
 }
 
 //render one frame
@@ -98,12 +100,13 @@ void Application::render(void)
 	model_matrix.rotate(angle, Vector3(0, 1, 0));
 	shader->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
 	shader->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
-	light->uploadToShader(shader_test);
+	
 
 	//CODE HERE: pass all the info needed by the shader to do the computations
 	//send the material and light uniforms to the shader
 	//...
-
+	light->uploadToShader(shader_test);
+	material->uploadToShader(shader_test);
 	//do the draw call into the GPU
 	mesh->render(GL_TRIANGLES);
 

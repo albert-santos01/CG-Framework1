@@ -10,8 +10,9 @@ Light::Light()
 }
 void Light::uploadToShader(Shader* shader){
 	shader->setVector3("light_position", position);
-	shader->setVector3("diffuse", diffuse_color);
-	shader->setVector3("specular", specular_color);
+	shader->setVector3("Id", diffuse_color);
+	shader->setVector3("Is", specular_color);
+
 
 }
 

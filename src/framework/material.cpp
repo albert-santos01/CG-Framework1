@@ -10,4 +10,11 @@ Material::Material()
 	shininess = 30.0; //glosiness coefficient (plasticity)
 }
 
+void Material::uploadToShader(Shader* shader){
+	shader->setVector3("Ka", ambient);
+	shader->setVector3("Kd", diffuse);
+	shader->setVector3("Ks", specular);
+	shader->setUniform1("alpha", shininess);
+}
+
 
