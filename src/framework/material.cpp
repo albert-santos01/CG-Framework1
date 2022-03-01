@@ -2,6 +2,7 @@
 
 
 
+
 Material::Material()
 {
 	ambient.set(1,1,1); //reflected ambient light

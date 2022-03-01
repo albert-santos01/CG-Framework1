@@ -2,6 +2,7 @@
 
 
 
+
 Light::Light()
 {
 	position.set(50, 50, 0);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework.h"
+#include <shader.h>
 
 //This class contains all the info about the properties of the light
 class Light
@@ -16,6 +17,6 @@ public:
 	Light();
 
 	//possible method: uploads properties to shader uniforms
-	void uploadToShader(Shader* shader);
+	void uploadToShader( Shader* shader);
 };
 

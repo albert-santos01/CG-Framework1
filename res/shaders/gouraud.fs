@@ -2,13 +2,13 @@
 //they are baricentric interpolated by pixel according to the distance to every vertex
 varying vec3 v_wPos;
 varying vec3 v_wNormal;
-
+varying  vec3 Ip;
 //here create uniforms for all the data we need here
 
 void main()
 {
 	//here we set up the normal as a color to see them as a debug
-	vec3 color = v_wNormal;
+	vec3 color = Ip;
 	//temp = color.x;
 	//color.z = color.x;
 	//color.y = color.x;

@@ -69,8 +69,8 @@ void Application::init(void)
 	//CODE HERE:
 	//create a light (or several) and and some materials
 	//...
-	light = Light();
-	material = Material();
+	light = new Light();
+	material = new Material();
 }
 
 //render one frame
@@ -98,9 +98,9 @@ void Application::render(void)
 	model_matrix.setIdentity();
 	model_matrix.translate(0,0,0); //example of translation
 	model_matrix.rotate(angle, Vector3(0, 1, 0));
-	shader->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
-	shader->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
-	shader->setVector3("camera_position", camera->eye);
+	shader_test->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
+	shader_test->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+	shader_test->setVector3("camera_position", camera->eye);
 	
 
 	//CODE HERE: pass all the info needed by the shader to do the computations
@@ -108,6 +108,7 @@ void Application::render(void)
 	//...
 	light->uploadToShader(shader_test);
 	material->uploadToShader(shader_test);
+	shader_test->setVector3("Ia", ambient_light);
 	//do the draw call into the GPU
 	mesh->render(GL_TRIANGLES);
 
