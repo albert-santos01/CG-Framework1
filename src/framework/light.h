@@ -16,6 +16,6 @@ public:
 	Light();
 
 	//possible method: uploads properties to shader uniforms
-	//void uploadToShader(Shader* shader);
+	void uploadToShader(Shader* shader);
 };
 

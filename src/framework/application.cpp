@@ -59,11 +59,10 @@ void Application::init(void)
 	shader = Shader::Get( "../res/shaders/simple.vs", "../res/shaders/simple.fs" );
 
 	//where to start:
-	/*shader_test = Shader::Get("../res/shaders/simple.vs", "../res/shaders/simple.fs");
-	shader_test->setFilenames("gouraud.vs", "gouraud.fs");*/
+	shader_test = Shader::Get("../res/shaders/gouraud.vs", "../res/shaders/gouraud.fs");
 
 	//where to start
-
+	light = Light();
 	//load your Gouraud and Phong shaders here and stored them in some global variables
 	//...
 
@@ -90,7 +89,8 @@ void Application::render(void)
 	glDepthFunc(GL_LEQUAL); //Z will pass if the Z is LESS or EQUAL to the Z of the pixel
 
 	//choose a shader and enable it
-	shader->enable();
+	//shader->enable();
+	shader_test->enable();
 
 	Matrix44 model_matrix;
 	model_matrix.setIdentity();
@@ -98,6 +98,7 @@ void Application::render(void)
 	model_matrix.rotate(angle, Vector3(0, 1, 0));
 	shader->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
 	shader->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+	light->uploadToShader(shader_test);
 
 	//CODE HERE: pass all the info needed by the shader to do the computations
 	//send the material and light uniforms to the shader
@@ -107,7 +108,8 @@ void Application::render(void)
 	mesh->render(GL_TRIANGLES);
 
 	//disable shader when we do not need it any more
-	shader->disable();
+	//shader->disable();
+	shader_test->disable();
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);

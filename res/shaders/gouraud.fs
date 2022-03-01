@@ -8,7 +8,7 @@ varying vec3 v_wNormal;
 void main()
 {
 	//here we set up the normal as a color to see them as a debug
-	vec3 color = vec3(1.0);
+	vec3 color = v_wNormal;
 	//temp = color.x;
 	//color.z = color.x;
 	//color.y = color.x;

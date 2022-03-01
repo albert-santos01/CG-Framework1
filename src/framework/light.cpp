@@ -8,5 +8,11 @@ Light::Light()
 	diffuse_color.set(0.6f,0.6f,0.6f);
 	specular_color.set(0.6f, 0.6f, 0.6f);
 }
+void Light::uploadToShader(Shader* shader){
+	shader->setVector3("light_position", position);
+	shader->setVector3("diffuse", diffuse_color);
+	shader->setVector3("specular", specular_color);
+
+}
 
 
