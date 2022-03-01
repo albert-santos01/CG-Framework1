@@ -5,6 +5,7 @@
 Image::Image() {
 	width = 0; height = 0;
 	pixels = NULL;
+	//barquito chiqitito
 }
 
 Image::Image(unsigned int width, unsigned int height)

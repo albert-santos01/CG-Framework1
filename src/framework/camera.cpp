@@ -7,6 +7,7 @@ Camera::Camera()
 {
 	view_matrix.setIdentity();
 	setOrthographic(-100,100,100,-100,-100,100);
+	//nene haz un backflip
 }
 
 void Camera::set()
