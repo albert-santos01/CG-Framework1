@@ -357,7 +357,6 @@ void Shader::release()
 void Shader::enable()
 {
 	glUseProgramObjectARB(program);
-	if (glGetError() == GL_NO_ERROR) printf("wtffff");
 	assert (glGetError() == GL_NO_ERROR);
 
 	last_slot = 0;

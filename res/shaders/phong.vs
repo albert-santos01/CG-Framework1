@@ -2,6 +2,16 @@
 uniform mat4 model;
 uniform mat4 viewprojection;
 
+uniform vec3 light_position;
+uniform vec3 Id;
+uniform vec3 Is;
+uniform vec3 camera_position;
+uniform vec3 Ka;
+uniform vec3 Kd;
+uniform vec3 Ks;
+uniform float alpha;
+uniform vec3 Ia;
+
 //vars to pass to the pixel shader
 varying vec3 v_wPos;
 varying vec3 v_wNormal;
@@ -19,8 +29,6 @@ void main()
 	v_wPos = wPos;
 	v_wNormal = wNormal;
 
-	//in GOURAUD compute the color here and pass it to the pixel shader
-	//...
 
 	//project the vertex by the model view projection 
 	gl_Position = viewprojection * vec4(wPos,1.0); //output of the vertex shader

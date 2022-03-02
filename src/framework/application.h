@@ -17,6 +17,7 @@ public:
 	float window_height;
 
 	float time;
+	int select;
 
 	//keyboard state
 	const Uint8* keystate;

@@ -1,7 +1,6 @@
 //this var comes from the vertex shader
 //they are baricentric interpolated by pixel according to the distance to every vertex
 varying vec3 v_wPos;
-//varying vec3 v_wNormal;
 varying  vec3 Ip;
 //here create uniforms for all the data we need here
 

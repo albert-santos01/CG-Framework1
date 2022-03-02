@@ -13,17 +13,18 @@
 
 Camera* camera = NULL;
 Mesh* mesh = NULL;
-Shader* shader = NULL;
-Shader* shader_test = NULL;
+Shader* gouraud = NULL;
+Shader* phong = NULL;
 //might be useful...
 Material* material = NULL;
 Light* light = NULL;
 Shader* phong_shader = NULL;
 Shader* gouraud_shader = NULL;
 
-Vector3 ambient_light(0.1,0.2,0.3); //here we can store the global ambient light of the scene
-
+Vector3 ambient_light(0.1, 0.2, 0.3); //here we can store the global ambient light of the scene
+Vector3 backgound_color(0, 0, 0);
 float angle = 0;
+
 
 Application::Application(const char* caption, int width, int height)
 {
@@ -56,11 +57,11 @@ void Application::init(void)
 		std::cout << "FILE Lee.obj NOT FOUND " << std::endl;
 
 	//we load one or several shaders...
-	shader = Shader::Get( "../res/shaders/simple.vs", "../res/shaders/simple.fs" );
 
 	//where to start:
-	shader_test = Shader::Get("../res/shaders/gouraud.vs", "../res/shaders/gouraud.fs");
+	gouraud = Shader::Get("../res/shaders/gouraud.vs", "../res/shaders/gouraud.fs");
 
+	phong = Shader::Get( "../res/shaders/phong.vs", "../res/shaders/phong.fs" );
 	//where to start
 	
 	//load your Gouraud and Phong shaders here and stored them in some global variables
@@ -83,7 +84,7 @@ void Application::render(void)
 	Matrix44 viewprojection = camera->getViewProjectionMatrix();
 
 	//set the clear color of the colorbuffer as the ambient light so it matches
-	glClearColor(ambient_light.x, ambient_light.y, ambient_light.z, 1.0);
+	glClearColor(backgound_color.x, backgound_color.y, backgound_color.z, 1.0);
 
 	// Clear the window and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear framebuffer and depth buffer 
@@ -92,29 +93,47 @@ void Application::render(void)
 
 	//choose a shader and enable it
 	//shader->enable();
-	shader_test->enable();
-
 	Matrix44 model_matrix;
 	model_matrix.setIdentity();
 	model_matrix.translate(0,0,0); //example of translation
 	model_matrix.rotate(angle, Vector3(0, 1, 0));
-	shader_test->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
-	shader_test->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
-	shader_test->setVector3("camera_position", camera->eye);
+
+
+	if (select==1){
+		gouraud->enable();
+		gouraud->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
+		gouraud->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+		gouraud->setVector3("camera_position", camera->eye);
+
+		light->uploadToShader(gouraud);
+		material->uploadToShader(gouraud);
+		gouraud->setVector3("Ia", ambient_light);
+
+
+		mesh->render(GL_TRIANGLES);
+		//disable shader when we do not need it any more
+		//shader->disable();
+		gouraud->disable();
+
+	}
+	else if (select == 2) {
+		phong->enable();
+		phong->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
+		phong->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+		phong->setVector3("camera_position", camera->eye);
+
+		light->uploadToShader(phong);
+		material->uploadToShader(phong);
+		phong->setVector3("Ia", ambient_light);
+		//do the draw call into the GPU
+		mesh->render(GL_TRIANGLES);
+		phong->disable();
+	}
 	
 
 	//CODE HERE: pass all the info needed by the shader to do the computations
 	//send the material and light uniforms to the shader
 	//...
-	light->uploadToShader(shader_test);
-	material->uploadToShader(shader_test);
-	shader_test->setVector3("Ia", ambient_light);
-	//do the draw call into the GPU
-	mesh->render(GL_TRIANGLES);
-
-	//disable shader when we do not need it any more
-	//shader->disable();
-	shader_test->disable();
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
@@ -145,6 +164,10 @@ void Application::onKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_r: 
 			Shader::ReloadAll();
 			break; //ESC key, kill the app
+
+		case SDLK_1: select = 1; break;
+		case SDLK_2: select = 2; break;
+
 	}
 }
 

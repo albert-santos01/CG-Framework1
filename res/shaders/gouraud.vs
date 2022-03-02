@@ -14,7 +14,6 @@ uniform vec3 Ia;
 
 //vars to pass to the pixel shader
 varying vec3 v_wPos;
-//varying vec3 v_wNormal;
 varying vec3 Ip;
 
 //here create uniforms for all the data we need here
@@ -35,7 +34,7 @@ void main()
 	vec3 L = light_position - wPos;
 	L = normalize(L);
 	vec3 V = camera_position - wPos;
-	L = normalize(L);
+	V = normalize(V);
 	vec3 R = wPos - light_position;
 	R = normalize(R);
 	R = reflect(R,wNormal);
@@ -48,7 +47,6 @@ void main()
 	R_V = pow(R_V, alpha);
 
 	Ip= Ka*Ia + Kd*L_N*Id + Ks*R_V*Is;
-	Ip = normalize(Ip);
 
 
 	//project the vertex by the model view projection 
