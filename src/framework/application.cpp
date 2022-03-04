@@ -17,9 +17,10 @@ Shader* gouraud = NULL;
 Shader* phong = NULL;
 //might be useful...
 Material* material = NULL;
-Light* light = NULL;
+std::vector <Light*> lights;
 Shader* phong_shader = NULL;
 Shader* gouraud_shader = NULL;
+Light* light = NULL;
 
 Vector3 ambient_light(0.1, 0.2, 0.3); //here we can store the global ambient light of the scene
 Vector3 backgound_color(0, 0, 0);
@@ -71,7 +72,13 @@ void Application::init(void)
 	//create a light (or several) and and some materials
 	//...
 	light = new Light();
+	Light* light2 = new Light(Vector3(-50, -50, 0), Vector3(1.0, 0.0, 0.0), Vector3(0.2, 0.4, 0.6));
+	Light* light3 = new Light(Vector3(-50, 50, 10), Vector3(0.2, 0.4, 0.6), Vector3(1.0, 1.0, 1.0));
 	material = new Material();
+	/*lights.push_back(light1);
+	lights.push_back(light2);
+	lights.push_back(light3);*/
+	lights = {light, light2, light3};
 }
 
 //render one frame
@@ -114,8 +121,8 @@ void Application::render(void)
 		//disable shader when we do not need it any more
 		//shader->disable();
 		gouraud->disable();
-
 	}
+
 	else if (select == 2) {
 		phong->enable();
 		phong->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
@@ -127,6 +134,29 @@ void Application::render(void)
 		phong->setVector3("Ia", ambient_light);
 		//do the draw call into the GPU
 		mesh->render(GL_TRIANGLES);
+		phong->disable();
+	}
+
+	else if (select == 3) {
+		phong->enable();
+		phong->setMatrix44("model", model_matrix); //upload the transform matrix to the shader
+		phong->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+		phong->setVector3("camera_position", camera->eye);
+		phong->setVector3("Ia", ambient_light);
+		
+		for (Light*light:lights){
+			light->uploadToShader(phong);
+			material->uploadToShader(phong);
+			//do the draw call into the GPU
+			mesh->render(GL_TRIANGLES);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+			phong->setVector3("Ia", Vector3(0,0,0));
+
+		}
+		
+		glDisable(GL_BLEND);
+
 		phong->disable();
 	}
 	
@@ -167,6 +197,7 @@ void Application::onKeyPressed( SDL_KeyboardEvent event )
 
 		case SDLK_1: select = 1; break;
 		case SDLK_2: select = 2; break;
+		case SDLK_3: select = 3; break;
 
 	}
 }

@@ -14,9 +14,12 @@ public:
 	Vector3 diffuse_color; //the amount (and color) of diffuse
 	Vector3 specular_color; //the amount (and color) of specular
 
-	Light();
+	static std::vector <Light> lights;
 
+	Light();
+	Light(Vector3 pos, Vector3 diffuse_c, Vector3 spec_col);
 	//possible method: uploads properties to shader uniforms
 	void uploadToShader( Shader* shader);
+	
 };
 
