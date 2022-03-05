@@ -8,9 +8,19 @@
 #include "includes.h"
 #include "framework.h"
 
+#include "image.h"
+#include "mesh.h"
+#include "shader.h"
+#include "texture.h"
+#include "camera.h"
+#include "material.h"
+#include "light.h"
+
 class Application
 {
 public:
+
+
 	//window
 	SDL_Window* window;
 	float window_width;
@@ -57,5 +67,18 @@ public:
 	void start();
 };
 
+class Entity {
+public:
+	Mesh* mesh;
+	Material* material;
+	Matrix44 model;
+	
+	Entity(Mesh* msh, Material* mat);
+
+	void set_entity(Shader* shader);
+
+	void set_position(int x, int y, int z);
+
+};
 
 #endif 

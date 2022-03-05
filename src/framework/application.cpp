@@ -3,13 +3,7 @@
 #include "includes.h"
 #include "utils.h"
 
-#include "image.h"
-#include "mesh.h"
-#include "shader.h"
-#include "texture.h"
-#include "camera.h"
-#include "material.h"
-#include "light.h"
+
 
 Camera* camera = NULL;
 Mesh* mesh = NULL;
@@ -18,6 +12,8 @@ Shader* phong = NULL;
 //might be useful...
 Material* material = NULL;
 std::vector <Light*> lights;
+std::vector <Entity*> entities;
+
 Shader* phong_shader = NULL;
 Shader* gouraud_shader = NULL;
 Light* light = NULL;
@@ -25,6 +21,7 @@ Light* light = NULL;
 Vector3 ambient_light(0.1, 0.2, 0.3); //here we can store the global ambient light of the scene
 Vector3 backgound_color(0, 0, 0);
 float angle = 0;
+int max_entities;
 
 
 Application::Application(const char* caption, int width, int height)
@@ -75,6 +72,16 @@ void Application::init(void)
 	Light* light2 = new Light(Vector3(-50, -50, 0), Vector3(1.0, 0.0, 0.0), Vector3(0.2, 0.4, 0.6));
 	Light* light3 = new Light(Vector3(-50, 50, 10), Vector3(0.2, 0.4, 0.6), Vector3(1.0, 1.0, 1.0));
 	material = new Material();
+	
+	/*Matrix44 model_matrix;
+	model_matrix.setIdentity();*/
+	max_entities = 5;
+	for (int i = 0; i < max_entities; i++) {
+		entities.push_back(new Entity(mesh, material));
+		entities[i]->set_position(((i % 5) - 2) * 22, ((int)(floor(i / 5) - 1) % 15) * 22, floor(i / 15) * 22);
+	}
+	
+
 	/*lights.push_back(light1);
 	lights.push_back(light2);
 	lights.push_back(light3);*/
@@ -159,6 +166,30 @@ void Application::render(void)
 
 		phong->disable();
 	}
+
+	else if (select == 4) {
+		phong->enable();
+		phong->setMatrix44("viewprojection", viewprojection); //upload viewprojection info to the shader
+		phong->setVector3("camera_position", camera->eye);
+		phong->setVector3("Ia", ambient_light);
+		glDisable(GL_BLEND);
+		
+		for (Light* light : lights) {
+			for (Entity* entity : entities) {
+				light->uploadToShader(phong);
+				entity->set_entity(phong);
+
+			}
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+			
+			phong->setVector3("Ia", Vector3(0, 0, 0));
+		}
+
+		glDisable(GL_BLEND);
+
+		phong->disable();
+	}
 	
 
 	//CODE HERE: pass all the info needed by the shader to do the computations
@@ -172,8 +203,15 @@ void Application::render(void)
 //called after render
 void Application::update(double seconds_elapsed)
 {
-	if (keystate[SDL_SCANCODE_SPACE])
+	if (keystate[SDL_SCANCODE_SPACE]){
+		for (int i = 0; i < max_entities; i++) {
+			entities[i]->model.rotate(-angle, Vector3(0, 1, 0));
+		}
 		angle += seconds_elapsed;
+		for (int i = 0; i < max_entities; i++) {
+			entities[i]->model.rotate(angle, Vector3(0, 1, 0));
+		}
+	}
 
 	if (keystate[SDL_SCANCODE_RIGHT])
 		camera->eye = camera->eye + Vector3(1, 0, 0) * seconds_elapsed * 10.0;
@@ -198,6 +236,15 @@ void Application::onKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_1: select = 1; break;
 		case SDLK_2: select = 2; break;
 		case SDLK_3: select = 3; break;
+		case SDLK_4: select = 4; break;
+		case SDLK_TAB: 
+			lights.push_back(new Light(Vector3((rand() % 88) - 44, (rand() % 44) - 22, 0), Vector3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX)), Vector3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX))));
+				break;
+		case SDLK_PLUS: 
+			max_entities++; 
+			entities.push_back(new Entity(mesh, material));
+			entities[max_entities-1]->set_position((((max_entities - 1) % 5) - 2) * 22, (((int)floor((max_entities - 1)/5)) % 15) - 1) * 22, (int)floor((max_entities - 1) / 15) * 22);
+			break;
 
 	}
 }
@@ -224,4 +271,22 @@ void Application::start()
 {
 	std::cout << "launching loop..." << std::endl;
 	launchLoop(this);
+}
+
+Entity::Entity(Mesh* msh, Material* mat) {
+	mesh = msh;
+	material = mat;
+	model.setIdentity();
+}
+
+
+void Entity::set_entity(Shader* shader) {
+	material->uploadToShader(shader),
+	shader->setMatrix44("model", model);
+	mesh->render(GL_TRIANGLES);
+
+}
+void Entity::set_position(int x, int y, int z){
+	model.translate(x,y,z);
+	model.rotate(angle, Vector3(0, 1, 0));
 }
