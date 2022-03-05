@@ -85,7 +85,7 @@ void Application::init(void)
 	/*lights.push_back(light1);
 	lights.push_back(light2);
 	lights.push_back(light3);*/
-	lights = {light, light2, light3};
+	lights = {light,light2,light3};
 }
 
 //render one frame
@@ -238,12 +238,12 @@ void Application::onKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_3: select = 3; break;
 		case SDLK_4: select = 4; break;
 		case SDLK_TAB: 
-			lights.push_back(new Light(Vector3((rand() % 88) - 44, (rand() % 44) - 22, 0), Vector3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX)), Vector3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX))));
+			lights.push_back(new Light(Vector3((rand() % 88) - 44, (rand() % 44) - 22, (rand() % 10)-5), Vector3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX)), Vector3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX))));
 				break;
 		case SDLK_PLUS: 
 			max_entities++; 
 			entities.push_back(new Entity(mesh, material));
-			entities[max_entities-1]->set_position((((max_entities - 1) % 5) - 2) * 22, (((int)floor((max_entities - 1)/5)) % 15) - 1) * 22, (int)floor((max_entities - 1) / 15) * 22);
+			entities[max_entities-1]->set_position((((max_entities - 1) % 5) - 2) * 22, ((((int)floor((max_entities - 1)/5)) % 15) - 1) * 22, (int)floor((max_entities - 1) / 15) * 22);
 			break;
 
 	}
