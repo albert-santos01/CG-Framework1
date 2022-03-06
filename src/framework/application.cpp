@@ -24,9 +24,9 @@ float angle = 0;
 float angle_xz = PI * 1.5;
 float angle_yz = 0;
 //float angle_xz = 0;
-float init_x = 50.0;
+float init_x = 0;
 float init_y = 50.0;
-float init_z = 0.0;
+float init_z = 50.0;
 int max_entities;
 
 
@@ -52,7 +52,8 @@ void Application::init(void)
 	
 	//here we create a global camera and set a position and projection properties
 	camera = new Camera();
-	camera->lookAt(Vector3(0,50,50),Vector3(0,10,0),Vector3(0,1,0));
+	camera->lookAt(Vector3(0,50,50),Vector3(0,0,0),Vector3(0,1,0));
+	printf("(%f) * cos(PI / 30) - (%f) * sin(PI / 30), 0.0, (%f)* sin(PI / 30) + (%f)* cos(PI / 30)); = (%f,%f)\n", camera->eye.x, camera->eye.z, camera->eye.x, camera->eye.z, (camera->eye.x) * cos(PI / 30) - (camera->eye.z) * sin(PI / 30), camera->eye.x * sin(PI / 30) + (camera->eye.z) * cos(PI / 30));
 	camera->setPerspective(60,window_width / window_height,0.1,10000);
 	r = camera->eye.distance(camera->center);
 	//then we load a mesh
@@ -99,13 +100,13 @@ void Application::render(void)
 {
 	//update eye position
 	/*camera->eye.x = init_x * cos(angle_xz) - init_z * sin(angle_xz);
-	camera->eye.z = -(init_x * sin(angle_xz) - init_z * cos(angle_xz));*/
+	camera->eye.z = -(init_x * sin(angle_xz) - init_z * cos(angle_xz));
 
 	camera->eye.y = init_y * cos(angle_yz) - init_z * sin(angle_yz);
-	camera->eye.z = init_y * sin(angle_yz) - init_z * cos(angle_yz);
+	camera->eye.z = init_y * sin(angle_yz) - init_z * cos(angle_yz);*/
 
-	//camera->eye.x = camera->eye.x * cos(angle_xz) - camera->eye.z * sin(angle_xz);
-	//camera->eye.z = -(camera->eye.x * sin(angle_xz) - camera->eye.z * cos(angle_xz));
+	/*camera->eye.x = camera->eye.x * cos(angle_xz) - camera->eye.z * sin(angle_xz);
+	camera->eye.z = -(camera->eye.x * sin(angle_xz) - camera->eye.z * cos(angle_xz));*/
 
 
 	//update the aspect of the camera acording to the window size
@@ -253,7 +254,9 @@ void Application::update(double seconds_elapsed)
 		camera->eye = camera->eye + Vector3(0, -1, 0) * seconds_elapsed * 10.0;
 
 	if (keystate[SDL_SCANCODE_RIGHT]){
+		camera->eye = Vector3((camera->eye.x) * cos(-seconds_elapsed) - (camera->eye.z) * sin(-seconds_elapsed), camera->eye.y, camera->eye.x * sin(-seconds_elapsed) + (camera->eye.z) * cos(-seconds_elapsed));
 		angle_xz += seconds_elapsed;
+		printf("(%f) * cos(PI / 30) - (%f) * sin(PI / 30), 0.0, (%f)* sin(PI / 30) + (%f)* cos(PI / 30)); = (%f,%f)\n", camera->eye.x,camera->eye.z, camera->eye.x, camera->eye.z, (camera->eye.x) * cos(PI / 30) - (camera->eye.z) * sin(PI / 30), camera->eye.x * sin(PI / 30) + (camera->eye.z) * cos(PI / 30));
 		//camera->eye.z = -(init_x * sin(angle_xz) - init_z * cos(angle_xz));
 
 		//camera->eye = camera->eye + Vector3((r)*cos(angle_xz), 0.0, (r)*sin(angle_xz)) * seconds_elapsed * 10.0;
@@ -276,6 +279,7 @@ void Application::update(double seconds_elapsed)
 		
 	}
 	else if (keystate[SDL_SCANCODE_LEFT]) {
+		camera->eye = Vector3((camera->eye.x) * cos(seconds_elapsed) - (camera->eye.z) * sin(seconds_elapsed), camera->eye.y, camera->eye.x * sin(seconds_elapsed) + (camera->eye.z) * cos(seconds_elapsed));
 		angle_xz -= seconds_elapsed;
 		//camera->eye= camera->eye - Vector3((r)*cos(angle_xz), 0, r*sin(angle_xz));
 		//camera->rotate(angle_xz, Vector3(1, 0, 0));
@@ -285,9 +289,12 @@ void Application::update(double seconds_elapsed)
 	}
 
 	if (keystate[SDL_SCANCODE_UP]) {
+		
+		camera->eye = Vector3(camera->eye.x, camera->eye.z * sin(seconds_elapsed) + (camera->eye.y) * cos(seconds_elapsed), (camera->eye.z) * cos(seconds_elapsed) - (camera->eye.y) * sin(seconds_elapsed)); 
 		angle_yz += seconds_elapsed;
 	}
 	else if (keystate[SDL_SCANCODE_DOWN]) {
+		camera->eye = Vector3(camera->eye.x, camera->eye.z * sin(-seconds_elapsed) + (camera->eye.y) * cos(-seconds_elapsed), (camera->eye.z) * cos(-seconds_elapsed) - (camera->eye.y) * sin(-seconds_elapsed));
 		angle_yz -= seconds_elapsed;
 	}
 }
