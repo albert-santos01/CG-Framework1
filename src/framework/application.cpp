@@ -21,8 +21,12 @@ int r = 0;
 Vector3 ambient_light(0.1, 0.2, 0.3); //here we can store the global ambient light of the scene
 Vector3 backgound_color(0, 0, 0);
 float angle = 0;
-float angle_xz = 270;
+float angle_xz = PI * 1.5;
 float angle_yz = 0;
+//float angle_xz = 0;
+float init_x = 20.0;
+float init_y = 20.0;
+float init_z = 0.0;
 int max_entities;
 
 
@@ -93,6 +97,17 @@ void Application::init(void)
 //render one frame
 void Application::render(void)
 {
+	//update eye position
+	camera->eye.x = init_x * cos(angle_xz) - init_z * sin(angle_xz);
+	camera->eye.z = -(init_x * sin(angle_xz) - init_z * cos(angle_xz));
+
+	camera->eye.y = init_z * cos(angle_yz) - init_y * sin(angle_yz);
+	camera->eye.z += init_z * sin(angle_yz) - init_y * cos(angle_yz);
+
+	//camera->eye.x = camera->eye.x * cos(angle_xz) - camera->eye.z * sin(angle_xz);
+	//camera->eye.z = -(camera->eye.x * sin(angle_xz) - camera->eye.z * cos(angle_xz));
+
+
 	//update the aspect of the camera acording to the window size
 	camera->aspect = window_width / window_height;
 	camera->updateProjectionMatrix();
@@ -100,7 +115,7 @@ void Application::render(void)
 	Matrix44 viewprojection = camera->getViewProjectionMatrix();
 	float* view = camera->view_matrix.m;
 
-	if (select == 3) {
+	/*if (select == 3) {
 		printf("-----------------------------RENDER----------------------------\n\n\n");
 		for (int i = 0; i < 16; i++) {
 			printf("m[%d] = %f\t", i, view[i]);
@@ -110,7 +125,7 @@ void Application::render(void)
 		}
 		printf("\n\n");
 		printf("---------------------------------------------------------------\n\n\n");
-	}
+	}*/
 
 	//set the clear color of the colorbuffer as the ambient light so it matches
 	glClearColor(backgound_color.x, backgound_color.y, backgound_color.z, 1.0);
@@ -238,7 +253,7 @@ void Application::update(double seconds_elapsed)
 		camera->eye = camera->eye + Vector3(0, -1, 0) * seconds_elapsed * 10.0;
 
 	if (keystate[SDL_SCANCODE_RIGHT]){
-		angle_xz = seconds_elapsed;
+		angle_xz += seconds_elapsed;
 
 		//camera->eye = camera->eye + Vector3((r)*cos(angle_xz), 0.0, (r)*sin(angle_xz)) * seconds_elapsed * 10.0;
 		//camera->rotate(angle_xz, Vector3(1, 0, 0));
@@ -260,15 +275,15 @@ void Application::update(double seconds_elapsed)
 		
 	}
 	else if (keystate[SDL_SCANCODE_LEFT]) {
-		angle_xz = seconds_elapsed;
+		angle_xz -= seconds_elapsed;
 		//camera->eye= camera->eye - Vector3((r)*cos(angle_xz), 0, r*sin(angle_xz));
 		//camera->rotate(angle_xz, Vector3(1, 0, 0));
-		camera->view_matrix.translate(camera->eye.x - seconds_elapsed, 0.0, 0.0);
-		camera->updateViewMatrix();
+		/*camera->view_matrix.translate(camera->eye.x - seconds_elapsed, 0.0, 0.0);
+		camera->updateViewMatrix();*/
 	}
 
 	if (keystate[SDL_SCANCODE_UP]) {
-		angle_yz = seconds_elapsed;
+		angle_yz += seconds_elapsed;
 	}
 	else if (keystate[SDL_SCANCODE_DOWN]) {
 		angle_yz = -seconds_elapsed;
