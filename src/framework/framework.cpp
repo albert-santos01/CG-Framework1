@@ -190,6 +190,8 @@ void Matrix44::setTranslation(float x, float y, float z)
 	m[12] = x;
 	m[13] = y;
 	m[14] = z;
+	/*printf("-------------------------------VALORES---------------------------------------\n\n");
+	printf("m[12] = %f, m[13] = %f, m[14] = %f\n\n", m[12], m[13], m[14]);*/
 }
 
 //To create a rotation matrix

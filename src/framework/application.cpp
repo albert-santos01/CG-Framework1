@@ -17,10 +17,12 @@ std::vector <Entity*> entities;
 Shader* phong_shader = NULL;
 Shader* gouraud_shader = NULL;
 Light* light = NULL;
-
+int r = 0;
 Vector3 ambient_light(0.1, 0.2, 0.3); //here we can store the global ambient light of the scene
 Vector3 backgound_color(0, 0, 0);
 float angle = 0;
+float angle_xz = 270;
+float angle_yz = 0;
 int max_entities;
 
 
@@ -48,7 +50,7 @@ void Application::init(void)
 	camera = new Camera();
 	camera->lookAt(Vector3(0,20,20),Vector3(0,10,0),Vector3(0,1,0));
 	camera->setPerspective(60,window_width / window_height,0.1,10000);
-
+	r = camera->eye.distance(camera->center);
 	//then we load a mesh
 	mesh = new Mesh();
 	if( !mesh->loadOBJ( "../res/meshes/lee.obj" ) )
@@ -78,7 +80,7 @@ void Application::init(void)
 	max_entities = 5;
 	for (int i = 0; i < max_entities; i++) {
 		entities.push_back(new Entity(mesh, material));
-		entities[i]->set_position(((i % 5) - 2) * 22, ((int)(floor(i / 5) - 1) % 15) * 22, floor(i / 15) * 22);
+		entities[i]->set_position(((i % 5) - 2) * 22, ((int)(floor(i / 5)) % 3) * 22, -(int)floor(i / 15) * 22);
 	}
 	
 
@@ -96,6 +98,19 @@ void Application::render(void)
 	camera->updateProjectionMatrix();
 	//Get the viewprojection matrix from our camera
 	Matrix44 viewprojection = camera->getViewProjectionMatrix();
+	float* view = camera->view_matrix.m;
+
+	if (select == 3) {
+		printf("-----------------------------RENDER----------------------------\n\n\n");
+		for (int i = 0; i < 16; i++) {
+			printf("m[%d] = %f\t", i, view[i]);
+			if (i % 4 == 3 && i != 0) {
+				printf("\n");
+			}
+		}
+		printf("\n\n");
+		printf("---------------------------------------------------------------\n\n\n");
+	}
 
 	//set the clear color of the colorbuffer as the ambient light so it matches
 	glClearColor(backgound_color.x, backgound_color.y, backgound_color.z, 1.0);
@@ -213,14 +228,51 @@ void Application::update(double seconds_elapsed)
 		}
 	}
 
-	if (keystate[SDL_SCANCODE_RIGHT])
+	if (keystate[SDL_SCANCODE_D])
 		camera->eye = camera->eye + Vector3(1, 0, 0) * seconds_elapsed * 10.0;
-	else if (keystate[SDL_SCANCODE_LEFT])
+	else if (keystate[SDL_SCANCODE_A])
 		camera->eye = camera->eye + Vector3(-1, 0, 0) * seconds_elapsed * 10.0;
-	if (keystate[SDL_SCANCODE_UP])
+	if (keystate[SDL_SCANCODE_W])
 		camera->eye = camera->eye + Vector3(0, 1, 0) * seconds_elapsed * 10.0;
-	else if (keystate[SDL_SCANCODE_DOWN])
+	else if (keystate[SDL_SCANCODE_S])
 		camera->eye = camera->eye + Vector3(0, -1, 0) * seconds_elapsed * 10.0;
+
+	if (keystate[SDL_SCANCODE_RIGHT]){
+		angle_xz = seconds_elapsed;
+
+		//camera->eye = camera->eye + Vector3((r)*cos(angle_xz), 0.0, (r)*sin(angle_xz)) * seconds_elapsed * 10.0;
+		//camera->rotate(angle_xz, Vector3(1, 0, 0));
+		/*camera->view_matrix.translate(camera->eye.x + seconds_elapsed*10, 0.0, 0.0);
+		printf("-------------------------------CAMARA---------------------------------------\n\n");
+		printf("e.x = %f, e.y = %f, e.z = %f\n\n", camera->eye.x, camera->eye.y, camera->eye.z);
+		camera->updateViewMatrix(); 
+		float* view= camera->view_matrix.m;
+		printf("-----------------------------UPDATE----------------------------\n\n\n");
+		for (int i = 0; i < 16; i++) {
+			printf("[%f]",view[i]);
+			if (i%4==3 && i!=0){
+				printf("\n");
+
+			}
+		}
+		printf("---------------------------------------------------------------\n\n\n");*/
+
+		
+	}
+	else if (keystate[SDL_SCANCODE_LEFT]) {
+		angle_xz = seconds_elapsed;
+		//camera->eye= camera->eye - Vector3((r)*cos(angle_xz), 0, r*sin(angle_xz));
+		//camera->rotate(angle_xz, Vector3(1, 0, 0));
+		camera->view_matrix.translate(camera->eye.x - seconds_elapsed, 0.0, 0.0);
+		camera->updateViewMatrix();
+	}
+
+	if (keystate[SDL_SCANCODE_UP]) {
+		angle_yz = seconds_elapsed;
+	}
+	else if (keystate[SDL_SCANCODE_DOWN]) {
+		angle_yz = -seconds_elapsed;
+	}
 }
 
 //keyboard press event 
@@ -243,8 +295,11 @@ void Application::onKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_PLUS: 
 			max_entities++; 
 			entities.push_back(new Entity(mesh, material));
-			entities[max_entities-1]->set_position((((max_entities - 1) % 5) - 2) * 22, ((((int)floor((max_entities - 1)/5)) % 15) - 1) * 22, (int)floor((max_entities - 1) / 15) * 22);
+			entities[max_entities-1]->set_position((((max_entities - 1) % 5) - 2) * 22, (((int)floor((max_entities - 1)/5)) % 3) * 22, -(int)floor((max_entities - 1) / 15) * 22);
 			break;
+		case SDLK_7: camera->eye = Vector3(0.0, 20.0, -20.0); break;
+		case SDLK_8: camera->eye = Vector3(0.0, 20.0, 20.0); break;
+		case SDLK_9: camera->eye = Vector3(0.0, -20.0, -20.0); break;
 
 	}
 }
