@@ -13,13 +13,13 @@ Shader* phong = NULL;
 Material* material = NULL;
 std::vector <Light*> lights;
 std::vector <Entity*> entities;
-
+int actual_light;
 Shader* phong_shader = NULL;
 Shader* gouraud_shader = NULL;
 Light* light = NULL;
 int r = 0;
 Vector3 ambient_light(0.1, 0.2, 0.3); //here we can store the global ambient light of the scene
-Vector3 backgound_color(0, 0, 0);
+Vector3 backgound_color(0.1, 0.2, 0.3);
 float angle = 0;
 float angle_xz = PI * 1.5;
 float angle_yz = 0;
@@ -52,15 +52,14 @@ void Application::init(void)
 	
 	//here we create a global camera and set a position and projection properties
 	camera = new Camera();
-	camera->lookAt(Vector3(0,50,50),Vector3(0,0,0),Vector3(0,1,0));
-	printf("(%f) * cos(PI / 30) - (%f) * sin(PI / 30), 0.0, (%f)* sin(PI / 30) + (%f)* cos(PI / 30)); = (%f,%f)\n", camera->eye.x, camera->eye.z, camera->eye.x, camera->eye.z, (camera->eye.x) * cos(PI / 30) - (camera->eye.z) * sin(PI / 30), camera->eye.x * sin(PI / 30) + (camera->eye.z) * cos(PI / 30));
+	camera->lookAt(Vector3(0, 20, 20), Vector3(0, 10, 0), Vector3(0, 1, 0));
 	camera->setPerspective(60,window_width / window_height,0.1,10000);
 	r = camera->eye.distance(camera->center);
 	//then we load a mesh
 	mesh = new Mesh();
 	if( !mesh->loadOBJ( "../res/meshes/lee.obj" ) )
 		std::cout << "FILE Lee.obj NOT FOUND " << std::endl;
-
+	actual_light = -1;
 	//we load one or several shaders...
 
 	//where to start:
@@ -243,60 +242,119 @@ void Application::update(double seconds_elapsed)
 			entities[i]->model.rotate(angle, Vector3(0, 1, 0));
 		}
 	}
-
-	if (keystate[SDL_SCANCODE_D])
-		camera->eye = camera->eye + Vector3(1, 0, 0) * seconds_elapsed * 10.0;
-	else if (keystate[SDL_SCANCODE_A])
-		camera->eye = camera->eye + Vector3(-1, 0, 0) * seconds_elapsed * 10.0;
-	if (keystate[SDL_SCANCODE_W])
-		camera->eye = camera->eye + Vector3(0, 1, 0) * seconds_elapsed * 10.0;
-	else if (keystate[SDL_SCANCODE_S])
-		camera->eye = camera->eye + Vector3(0, -1, 0) * seconds_elapsed * 10.0;
-
-	if (keystate[SDL_SCANCODE_RIGHT]){
-		camera->eye = Vector3((camera->eye.x) * cos(-seconds_elapsed) - (camera->eye.z) * sin(-seconds_elapsed), camera->eye.y, camera->eye.x * sin(-seconds_elapsed) + (camera->eye.z) * cos(-seconds_elapsed));
-		angle_xz += seconds_elapsed;
-		printf("(%f) * cos(PI / 30) - (%f) * sin(PI / 30), 0.0, (%f)* sin(PI / 30) + (%f)* cos(PI / 30)); = (%f,%f)\n", camera->eye.x,camera->eye.z, camera->eye.x, camera->eye.z, (camera->eye.x) * cos(PI / 30) - (camera->eye.z) * sin(PI / 30), camera->eye.x * sin(PI / 30) + (camera->eye.z) * cos(PI / 30));
-		//camera->eye.z = -(init_x * sin(angle_xz) - init_z * cos(angle_xz));
-
-		//camera->eye = camera->eye + Vector3((r)*cos(angle_xz), 0.0, (r)*sin(angle_xz)) * seconds_elapsed * 10.0;
-		//camera->rotate(angle_xz, Vector3(1, 0, 0));
-		/*camera->view_matrix.translate(camera->eye.x + seconds_elapsed*10, 0.0, 0.0);
-		printf("-------------------------------CAMARA---------------------------------------\n\n");
-		printf("e.x = %f, e.y = %f, e.z = %f\n\n", camera->eye.x, camera->eye.y, camera->eye.z);
-		camera->updateViewMatrix(); 
-		float* view= camera->view_matrix.m;
-		printf("-----------------------------UPDATE----------------------------\n\n\n");
-		for (int i = 0; i < 16; i++) {
-			printf("[%f]",view[i]);
-			if (i%4==3 && i!=0){
-				printf("\n");
-
-			}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_A]) {
+		printf("1st light activated\n");
+		actual_light = 0;
+	}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_B]) {
+		printf("2nd light activated\n");
+		actual_light = 1;
+	}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_C]) {
+		printf("3rd light activated\n");
+		actual_light = 2;
+	}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_D]) {
+		if (lights.size() >= 4) {
+			printf("4th light activated\n");
+			actual_light = 3;
 		}
-		printf("---------------------------------------------------------------\n\n\n");*/
-
+		else printf("You must add %d additional light/s in order to execute this command.\n", 4 - lights.size()); 
 		
 	}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_E]) {
+		if(lights.size() >= 5){
+			printf("5th light activated\n");
+			actual_light = 4;
+		}
+		else printf("You must add %d additional light/s in order to execute this command.\n", 5 - lights.size());
+	}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_F]) {
+		if (lights.size() >= 6) {
+			printf("6th light activated\n");
+			actual_light = 5;
+		}
+		else printf("You must add %d additional light/s in order to execute this command.\n", 6 - lights.size());
+	}
+	if (keystate[SDL_SCANCODE_L] && keystate[SDL_SCANCODE_G]) {
+		if(lights.size()>=7){
+			printf("7th light activated\n");
+			actual_light = 6;
+		}
+		else printf("You must add %d additional light/s in order to execute this command.\n", 7 - lights.size());
+	}
+
+	if (keystate[SDL_SCANCODE_D] && !keystate[SDL_SCANCODE_L] && actual_light != -1) {
+		Vector3 pos_light = lights.at(actual_light)->position;
+		lights.at(actual_light)->position.set(pos_light.x + 360 * seconds_elapsed, pos_light.y, pos_light.z);
+	}
+	else if (keystate[SDL_SCANCODE_A] && !keystate[SDL_SCANCODE_L] && actual_light != -1) {
+		Vector3 pos_light = lights.at(actual_light)->position;
+		lights.at(actual_light)->position.set(pos_light.x - 360 * seconds_elapsed, pos_light.y, pos_light.z);
+	}
+	if (keystate[SDL_SCANCODE_W] && !keystate[SDL_SCANCODE_L] && actual_light != -1) {
+		Vector3 pos_light = lights.at(actual_light)->position;
+		lights.at(actual_light)->position.set(pos_light.x , pos_light.y + 360 * seconds_elapsed, pos_light.z);
+	}
+	else if (keystate[SDL_SCANCODE_S] && !keystate[SDL_SCANCODE_L] && actual_light != -1) {
+		Vector3 pos_light = lights.at(actual_light)->position;
+		lights.at(actual_light)->position.set(pos_light.x, pos_light.y + 360 * seconds_elapsed, pos_light.z);
+	}
+	if (keystate[SDL_SCANCODE_Z] && !keystate[SDL_SCANCODE_L] && actual_light != -1) {
+		Vector3 pos_light = lights.at(actual_light)->position;
+		lights.at(actual_light)->position.set(pos_light.x, pos_light.y, pos_light.z + 360 * seconds_elapsed);
+	}
+	else if (keystate[SDL_SCANCODE_X] && !keystate[SDL_SCANCODE_L] && actual_light != -1) {
+		Vector3 pos_light = lights.at(actual_light)->position;
+		lights.at(actual_light)->position.set(pos_light.x, pos_light.y, pos_light.z - 360 * seconds_elapsed);
+	}
+	Vector3 vecTranslate = camera->eye - camera->center;
+
+	if (keystate[SDL_SCANCODE_RIGHT]){
+		vecTranslate = Vector3((vecTranslate.x) * cos(-seconds_elapsed) - (vecTranslate.z) * sin(-seconds_elapsed), vecTranslate.y, vecTranslate.x * sin(-seconds_elapsed) + (vecTranslate.z) * cos(-seconds_elapsed));
+		camera->eye = vecTranslate + camera->center;
+		angle_xz += seconds_elapsed;
+		}
 	else if (keystate[SDL_SCANCODE_LEFT]) {
-		camera->eye = Vector3((camera->eye.x) * cos(seconds_elapsed) - (camera->eye.z) * sin(seconds_elapsed), camera->eye.y, camera->eye.x * sin(seconds_elapsed) + (camera->eye.z) * cos(seconds_elapsed));
+		vecTranslate = Vector3((vecTranslate.x) * cos(seconds_elapsed) - (vecTranslate.z) * sin(seconds_elapsed), vecTranslate.y, vecTranslate.x * sin(seconds_elapsed) + (vecTranslate.z) * cos(seconds_elapsed));
+		camera->eye = vecTranslate + camera->center;
 		angle_xz -= seconds_elapsed;
-		//camera->eye= camera->eye - Vector3((r)*cos(angle_xz), 0, r*sin(angle_xz));
-		//camera->rotate(angle_xz, Vector3(1, 0, 0));
-		/*camera->view_matrix.translate(camera->eye.x - seconds_elapsed, 0.0, 0.0);
-		camera->updateViewMatrix();*/
-		//camera->eye.z = -(init_x * sin(angle_xz) - init_z * cos(angle_xz));
 	}
 
 	if (keystate[SDL_SCANCODE_UP]) {
 		
-		camera->eye = Vector3(camera->eye.x, camera->eye.z * sin(seconds_elapsed) + (camera->eye.y) * cos(seconds_elapsed), (camera->eye.z) * cos(seconds_elapsed) - (camera->eye.y) * sin(seconds_elapsed)); 
+		vecTranslate = Vector3(vecTranslate.x, vecTranslate.z * sin(seconds_elapsed) + (vecTranslate.y) * cos(seconds_elapsed), (vecTranslate.z) * cos(seconds_elapsed) - (vecTranslate.y) * sin(seconds_elapsed));
+		camera->eye = vecTranslate + camera->center;
 		angle_yz += seconds_elapsed;
 	}
 	else if (keystate[SDL_SCANCODE_DOWN]) {
-		camera->eye = Vector3(camera->eye.x, camera->eye.z * sin(-seconds_elapsed) + (camera->eye.y) * cos(-seconds_elapsed), (camera->eye.z) * cos(-seconds_elapsed) - (camera->eye.y) * sin(-seconds_elapsed));
+		vecTranslate = Vector3(vecTranslate.x, vecTranslate.z * sin(-seconds_elapsed) + (vecTranslate.y) * cos(-seconds_elapsed), (vecTranslate.z) * cos(-seconds_elapsed) - (vecTranslate.y) * sin(-seconds_elapsed));
+		camera->eye = vecTranslate + camera->center;
 		angle_yz -= seconds_elapsed;
 	}
+	else if (keystate[SDL_SCANCODE_N]) {
+		
+		vecTranslate = Vector3((vecTranslate.x) * cos(-seconds_elapsed) - (vecTranslate.y) * sin(-seconds_elapsed), vecTranslate.x * sin(-seconds_elapsed) + (vecTranslate.y) * cos(-seconds_elapsed),vecTranslate.z);
+		camera->eye = vecTranslate + camera->center;
+	}
+	else if (keystate[SDL_SCANCODE_M]) {
+		vecTranslate = Vector3(vecTranslate.x * cos(seconds_elapsed) - (vecTranslate.y) * sin(seconds_elapsed), vecTranslate.x * sin(seconds_elapsed) + (vecTranslate.y) * cos(seconds_elapsed), vecTranslate.z);
+		camera->eye = vecTranslate + camera->center;
+	}
+	if (keystate[SDL_SCANCODE_L])
+		camera->center = camera->center + Vector3(1, 0, 0) * seconds_elapsed * 10.0;
+	else if (keystate[SDL_SCANCODE_J])
+		camera->center = camera->center + Vector3(-1, 0, 0) * seconds_elapsed * 10.0;
+	if (keystate[SDL_SCANCODE_I])
+		camera->center = camera->center + Vector3(0, 1, 0) * seconds_elapsed * 10.0;
+	else if (keystate[SDL_SCANCODE_K])
+		camera->center = camera->center + Vector3(0, -1, 0) * seconds_elapsed * 10.0;
+	if (keystate[SDL_SCANCODE_R]) {
+		camera->lookAt(Vector3(0, 20, 20), Vector3(0, 10, 0), Vector3(0, 1, 0));
+		camera->setPerspective(60, window_width / window_height, 0.1, 10000);
+
+	}
+
 }
 
 //keyboard press event 
